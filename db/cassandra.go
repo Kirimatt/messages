@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/gocql/gocql"
 )
@@ -68,6 +70,40 @@ func GetAllMessagesByRoomId(roomId gocql.UUID) []Message {
 		log.Fatal(err)
 	}
 	return messages
+}
+
+func GetBotUser() Author {
+	if os.Getenv("BOT_USER_UUID") == "" {
+		os.Setenv("BOT_USER_UUID", "88a2c050-d1e8-11ee-bfde-16e722bb8d94")
+	}
+	uuid, err := gocql.ParseUUID(os.Getenv("BOT_USER_UUID"))
+	if err != nil {
+		log.Fatal("Cannot get uuid for bot user")
+	}
+	return Author{
+		ID:        uuid,
+		Firstname: "Bot",
+		Lastname:  "Zanger",
+	}
+}
+
+func InsertAndGetBotMessage(text string, roomId gocql.UUID) Message {
+	message := Message{
+		Author:    GetBotUser(),
+		ID:        gocql.TimeUUID(),
+		CreatedAt: time.Now().UnixMilli(),
+		Name:      "",
+		Size:      0,
+		Status:    "seen",
+		Type:      "text",
+		Uri:       "",
+		Width:     0,
+		Height:    0,
+		Text:      text,
+		RoomId:    roomId,
+	}
+	CreateMessage(message)
+	return message
 }
 
 // func GetOneStudent(w http.ResponseWriter, r *http.Request) {

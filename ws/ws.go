@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
@@ -64,26 +63,7 @@ func (server *Server) echo(w http.ResponseWriter, r *http.Request) {
 				server.WriteMessage(message)
 			}
 		} else {
-			author := db.Author{
-				ID:        gocql.TimeUUID(),
-				Firstname: "Bot",
-				Lastname:  "Zanger",
-			}
-			message := db.Message{
-				Author:    author,
-				ID:        gocql.TimeUUID(),
-				CreatedAt: time.Now().UnixMilli(),
-				Name:      "",
-				Size:      0,
-				Status:    "seen",
-				Type:      "text",
-				Uri:       "",
-				Width:     0,
-				Height:    0,
-				Text:      "Hello, there is lawyer bot",
-				RoomId:    uuid,
-			}
-			server.WriteMessage(message)
+			server.WriteMessage(db.InsertAndGetBotMessage("Hello, there is lawyer bot", uuid))
 		}
 		for {
 			mt, message, err := connection.ReadMessage()
