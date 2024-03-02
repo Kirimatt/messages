@@ -2,13 +2,15 @@ package main
 
 import (
 	"bytes"
-	"db"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
-	"ws"
+
+	"github.com/kirimatt/db"
+
+	"github.com/kirimatt/ws"
 )
 
 type ModelResponse struct {

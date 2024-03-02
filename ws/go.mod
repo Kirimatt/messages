@@ -1,4 +1,4 @@
-module ws
+module github.com/kirimatt/ws
 
 go 1.21.5
 
