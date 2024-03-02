@@ -1,19 +1,30 @@
-FROM golang:1.21.5
+# syntax=docker/dockerfile:1
 
-# Set the Current Working Directory inside the container
-WORKDIR $GOPATH/src/github.com/codefresh-contrib/go-sample-app
+# Build the application from source
+FROM golang:1.21.5 AS build-stage
 
-# Copy everything from the current directory to the PWD (Present Working Directory) inside the container
-COPY . .
+WORKDIR /app
 
-# Download all the dependencies
-RUN go get -d -v ./...
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Install the package
-RUN go install -v ./...
+COPY *.go ./
 
-# This container exposes port 8080 to the outside world
+RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
+
+# Run the tests in the container
+FROM build-stage AS run-test-stage
+RUN go test -v ./...
+
+# Deploy the application binary into a lean image
+FROM gcr.io/distroless/base-debian11 AS build-release-stage
+
+WORKDIR /
+
+COPY --from=build-stage /docker-gs-ping /docker-gs-ping
+
 EXPOSE 8080
 
-# Run the executable
-CMD ["go-sample-app"]
+USER nonroot:nonroot
+
+ENTRYPOINT ["/docker-gs-ping"]

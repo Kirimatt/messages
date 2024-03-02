@@ -1,9 +1,8 @@
-package db
+package main
 
 import (
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -29,10 +28,6 @@ type Message struct {
 	Height    int64      `json:"height" db:"height" cql:"height"`
 	Text      string     `json:"text" db:"text" cql:"text"`
 	RoomId    gocql.UUID `json:"roomId" db:"room_id" cql:"room_id"`
-}
-
-func homeLink(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Restful API using Go and Cassandra!")
 }
 
 func CreateMessage(NewMessage Message) {

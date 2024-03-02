@@ -7,17 +7,13 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/kirimatt/db"
-
-	"github.com/kirimatt/ws"
 )
 
 type ModelResponse struct {
 	OutputText string `json:"output_text"`
 }
 
-var server *ws.Server
+var server *Server
 
 func init() {
 	if os.Getenv("MODEL_URL") == "" {
@@ -30,7 +26,7 @@ func init() {
 }
 
 func main() {
-	server = ws.StartServer(messageHandler)
+	server = StartServer(messageHandler)
 
 	for {
 		time.Sleep(time.Second)
@@ -38,19 +34,19 @@ func main() {
 }
 
 func messageHandler(messageBytes []byte) {
-	var NewMessage db.Message
+	var NewMessage Message
 	err := json.Unmarshal(messageBytes, &NewMessage)
 	if err != nil {
 		fmt.Println("An error occured while unmarshalling message ", string(messageBytes))
 	}
 
 	if NewMessage.Type != "" {
-		db.CreateMessage(NewMessage)
+		CreateMessage(NewMessage)
 		Conv, _ := json.MarshalIndent(NewMessage, "", " ")
 		fmt.Println(string(Conv))
 
 		server.WriteMessage(
-			db.InsertAndGetBotMessage(
+			InsertAndGetBotMessage(
 				postToModel(NewMessage).OutputText,
 				NewMessage.RoomId,
 			),
@@ -58,7 +54,7 @@ func messageHandler(messageBytes []byte) {
 	}
 }
 
-func postToModel(NewMessage db.Message) ModelResponse {
+func postToModel(NewMessage Message) ModelResponse {
 	posturl := os.Getenv("MODEL_URL") + os.Getenv("MODEL_CHAT_API")
 
 	body := []byte(

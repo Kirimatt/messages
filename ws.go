@@ -1,12 +1,10 @@
-package ws
+package main
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-
-	"github.com/kirimatt/db"
 
 	"github.com/gocql/gocql"
 	"github.com/gorilla/websocket"
@@ -87,24 +85,24 @@ func (server *Server) authorize(AuthorizedUser AuthorizedUser, connection *webso
 		IsEnabled: true,
 	}
 
-	messages := db.GetAllMessagesByRoomId(uuid)
+	messages := GetAllMessagesByRoomId(uuid)
 
 	if len(messages) != 0 {
 		for _, message := range messages {
 			server.WriteMessage(message)
 		}
 	} else {
-		server.WriteMessage(db.InsertAndGetBotMessage(os.Getenv("BOT_FIRST_MESSAGE"), uuid))
+		server.WriteMessage(InsertAndGetBotMessage(os.Getenv("BOT_FIRST_MESSAGE"), uuid))
 	}
 }
 
-func (server *Server) WriteMessage(message db.Message) {
+func (server *Server) WriteMessage(message Message) {
 	Conv, _ := json.MarshalIndent(message, "", " ")
 	fmt.Println(string(Conv))
 	for conn, client := range server.clients {
 		if *client.RoomId == message.RoomId {
 			conn.WriteMessage(websocket.TextMessage, Conv)
-			db.CreateMessage(message)
+			CreateMessage(message)
 		}
 	}
 }
