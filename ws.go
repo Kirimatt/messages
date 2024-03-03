@@ -41,7 +41,7 @@ func StartServer(handleMessage func(bytes []byte)) *Server {
 	}
 
 	http.HandleFunc("/", server.echo)
-	go http.ListenAndServe("localhost:8080", nil) // Уводим http сервер в горутину
+	go http.ListenAndServe(":8080", nil) // Уводим http сервер в горутину
 
 	return &server
 }

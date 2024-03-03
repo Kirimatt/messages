@@ -1,30 +1,12 @@
-# syntax=docker/dockerfile:1
+FROM golang:1.21.5
 
-# Build the application from source
-FROM golang:1.21.5 AS build-stage
+WORKDIR /usr/src/app
 
-WORKDIR /app
-
+# pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod download && go mod verify
 
-COPY *.go ./
+COPY . .
+RUN go build -v -o /usr/local/bin/app ./...
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
-
-# Run the tests in the container
-FROM build-stage AS run-test-stage
-RUN go test -v ./...
-
-# Deploy the application binary into a lean image
-FROM gcr.io/distroless/base-debian11 AS build-release-stage
-
-WORKDIR /
-
-COPY --from=build-stage /docker-gs-ping /docker-gs-ping
-
-EXPOSE 8080
-
-USER nonroot:nonroot
-
-ENTRYPOINT ["/docker-gs-ping"]
+CMD ["app"]

@@ -28,6 +28,8 @@ func init() {
 func main() {
 	server = StartServer(messageHandler)
 
+	fmt.Printf("Cassandra connection url: %s", os.Getenv("CASSANDRA_CONNECTION_URL"))
+	fmt.Println()
 	for {
 		time.Sleep(time.Second)
 	}
