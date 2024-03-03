@@ -7,6 +7,36 @@ services:
       - "9042:9042"
     volumes:
       - cassandra-volume:/var/lib/cassandra
+    networks:
+      - ms-network
+  zanger-client-web-service:
+    image: zanger-web:latest
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      BACKEND_URL: ws://zanger-messages-service:8080
+    depends_on: 
+      zanger-messages-service:
+        condition: service_started
+    networks:
+      - ms-network
+  zanger-messages-service:
+    image: zanger-messages:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      CASSANDRA_CONNECTION_URL: cassandra-service
+    depends_on:
+      cassandra-service:
+        condition: service_started
+    networks:
+      - ms-network
 
 volumes:
   cassandra-volume:
+
+networks:
+  ms-network:
+    driver: bridge

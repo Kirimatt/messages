@@ -50,6 +50,8 @@ func (server *Server) echo(w http.ResponseWriter, r *http.Request) {
 	connection, _ := upgrader.Upgrade(w, r, nil)
 	defer connection.Close()
 
+	fmt.Println("Connected with websocket")
+
 	server.clients[connection] = Client{
 		RoomId:    nil,
 		IsEnabled: true,
