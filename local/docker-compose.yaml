@@ -5,6 +5,9 @@ services:
     image: cassandra:4.0
     ports:
       - "9042:9042"
+    environment:
+      - HEAP_NEWSIZE=128M
+      - MAX_HEAP_SIZE=740M
     volumes:
       - cassandra-volume:/var/lib/cassandra
     networks:
