@@ -8,13 +8,8 @@ services:
     environment:
       - HEAP_NEWSIZE=128M
       - MAX_HEAP_SIZE=740M
-    volumes:
-      - cassandra-volume:/var/lib/cassandra
     networks:
       - ms-network
-
-volumes:
-  cassandra-volume:
 
 networks:
   ms-network:
