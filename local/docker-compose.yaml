@@ -28,6 +28,10 @@ services:
       - "8080:8080"
     environment:
       CASSANDRA_CONNECTION_URL: cassandra-service
+      BOT_FIRST_MESSAGE: |
+        Здравствуйте! 
+        Меня зовут Зангер, и я здесь, чтобы помочь вам с юридическими вопросами. 
+        Что именно вас интересует сегодня?
     depends_on:
       cassandra-service:
         condition: service_started
