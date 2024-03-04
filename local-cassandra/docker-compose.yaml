@@ -7,7 +7,7 @@ services:
       - "9042:9042"
     environment:
       - HEAP_NEWSIZE=128M
-      - MAX_HEAP_SIZE=350M
+      - MAX_HEAP_SIZE=300M
     volumes:
       - cassandra-volume:/var/lib/cassandra
     networks:
